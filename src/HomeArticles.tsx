@@ -1,0 +1,13 @@
+import { useEffect, useState } from "react"
+import type { Page } from "./App"
+import { articleApi, resolveMediaUrl, type Article } from "./api"
+import { ArrowRightIcon } from "./icons"
+
+export default function HomeArticles({ onNavigate }: { onNavigate: (page: Page) => void }) {
+  const [articles, setArticles] = useState<Article[]>([])
+  const [loading, setLoading] = useState(true)
+  useEffect(() => { articleApi.publicList({ limit: 3, sort: "newest" }).then(response => setArticles(response.data.articles)).catch(() => setArticles([])).finally(() => setLoading(false)) }, [])
+  const open = (article: Article) => { history.pushState({}, "", `/articles/${article.slug}`); onNavigate("article-read") }
+  if (!loading && !articles.length) return null
+  return <section className="bg-[#F8F4EA] px-4 py-20"><div className="mx-auto max-w-[1240px]"><div className="mb-12 flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="mb-3 text-xs font-bold uppercase tracking-[.22em] text-[#C6A15B]">Stories & Insights</p><h2 className="font-serif text-3xl font-bold md:text-4xl">Explore Africa Through Our Stories</h2></div><button onClick={() => onNavigate("articles")} className="flex items-center gap-2 text-sm font-semibold text-[#C6A15B]">View All Articles <ArrowRightIcon /></button></div>{loading ? <div className="grid gap-6 md:grid-cols-3">{[1,2,3].map(i => <div key={i} className="h-96 animate-pulse rounded-2xl bg-[#E9E1D3]" />)}</div> : <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">{articles.map(article => <article key={article.id} onClick={() => open(article)} className="group flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-[#E6DFD2] bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl"><div className="aspect-[16/10] overflow-hidden bg-[#EEE7D9]">{article.featured_image?.url ? <img src={resolveMediaUrl(article.featured_image.url)} alt={article.featured_image.alt_text || article.title} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" /> : <div className="grid h-full place-items-center font-serif text-2xl text-[#C6A15B]">KOBANI</div>}</div><div className="flex flex-1 flex-col p-5"><span className="text-[10px] font-bold text-[#C6A15B]">{article.category.name}</span><h3 className="mt-2 font-serif text-lg font-bold leading-snug">{article.title}</h3><p className="mt-3 line-clamp-3 flex-1 text-xs leading-6 text-[#6F6B63]">{article.excerpt}</p><div className="mt-5 flex items-center border-t pt-4 text-xs"><span className="font-semibold">{article.author.display_name}</span><span className="ml-auto text-[#C6A15B]">Read More →</span></div></div></article>)}</div>}</div></section>
+}

@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /customer/
+Disallow: /booking
+Disallow: /login
+Disallow: /create-account
+Disallow: /verify-email
+Disallow: /market/checkout
+
+Sitemap: https://www.kobanitours.com/sitemap.xml
